@@ -5,8 +5,7 @@ const path = require('path');
 module.exports = {
   mode: 'development',
   plugins: [
-    new CopyPlugin([{ from: "public" }]),
-    new CopyPlugin([{ from: "src/assets", to: "assets" }]),
+    new CopyPlugin([{ from: "public" },{ from: "src/assets", to: "assets" }]),
     new HtmlWebpackPlugin({
       inject: true,
       template: "public/index.html"
