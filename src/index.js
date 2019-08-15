@@ -1,31 +1,43 @@
 import * as PIXI from "pixi.js";
 
-const app = new PIXI.Application({antialias: true});
-let SCALE = 1
+const app = new PIXI.Application({ antialias: true });
+let SCALE = 1;
 document.body.appendChild(app.view);
 
-app.loader.add("bunny", "assets/bunny.png")
-.add("ghost", "assets/ghost.png")
-.load((loader, resources) => {
-  const bunny = new PIXI.Sprite(resources.bunny.texture);
-  let ghost = PIXI.Texture.from("ghost");
-  
-  bunny.scale.set(SCALE)
-  bunny.x = app.renderer.width / 2;
-  bunny.y = app.renderer.height / 2;
-  bunny.anchor.set(0.5)
+const loader = app.loader;
 
-  bunny.interactive = true;
-  bunny.on('click', () => {
-    bunny.texture = resources.ghost.texture
-    bunny.scale.set(0.1)
-  });
+loader.add("foodsheet", "assets/food.json");
+loader.load();
 
-  app.stage.addChild(bunny);
-  app.ticker.add(() => bunnychanger(bunny));
+loader.onComplete.add(loaded);
+loader.onProgress.add(loading);
 
-});
+function loaded(loader, resources) {
+  console.log("All assets loaded!");
 
-const bunnychanger = (bunny) => {
-  bunny.rotation += 0.01;
+  let sheet = loader.resources["foodsheet"].spritesheet;
+
+  for (let i = 0; i < 3; i++) {
+    let eatable = new PIXI.Sprite();
+
+    let tickingFood = setInterval(() => {
+      eatable.texture = sheet.textures["sprite" + Math.floor(Math.random() * 42 + 1)];
+    }, 250);
+    eatable.interactive = true;
+    eatable.on("click", () => {
+      clearInterval(tickingFood);
+    });
+    eatable.anchor.set(0.5);
+
+    eatable.x = app.renderer.width / 2 + i * 64 - (3 * 64) / 3;
+    eatable.y = app.renderer.height / 2;
+
+    app.stage.addChild(eatable);
+  }
+
+  app.ticker.add(() => {});
+}
+
+function loading(process) {
+  console.log("loading: " + process.progress + "%");
 }
